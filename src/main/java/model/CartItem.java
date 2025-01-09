@@ -18,7 +18,6 @@ public class CartItem {
         this.price = price;
     }
 
-    // Getters và Setters
     public int getId() {
         return id;
     }
@@ -59,7 +58,6 @@ public class CartItem {
         this.price = price;
     }
 
-    // Tính tổng giá tiền cho một sản phẩm
     public double calculateTotal() {
         return this.quantity * this.price;
     }

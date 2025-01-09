@@ -31,67 +31,94 @@
 <body>
 <div class="container mt-5">
 
-    <!-- Hiển thị giỏ hàng -->
+    <!-- Tiêu đề -->
     <h1 class="text-center">Giỏ Hàng Của Bạn</h1>
     <hr>
+
+    <!-- Kiểm tra xem giỏ hàng có sản phẩm không -->
     <c:choose>
         <c:when test="${cart == null || cart.size() == 0}">
-            <p class="text-center text-secondary mt-4">Giỏ hàng hiện đang trống.</p>
+            <p class="text-center text-secondary mt-4">Giỏ hàng của bạn hiện đang trống.</p>
+            <div class="text-center mt-3">
+                <a href="products.jsp" class="btn btn-primary">Quay lại cửa hàng</a>
+            </div>
         </c:when>
         <c:otherwise>
-            <table class="table table-bordered">
-                <thead class="table-light">
-                <tr>
-                    <th>#</th>
-                    <th>ID Sản phẩm</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Đơn giá</th>
-                    <th>Số lượng</th>
-                    <th>Thành tiền</th>
-                    <th>Hành động</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="item" items="${cart}" varStatus="status">
-                    <tr>
-                        <td>${status.index + 1}</td>
-                        <td>${item.productId}</td>
-                        <td>${item.productName}</td>
-                        <td>${item.productPrice} VND</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.quantity * item.productPrice} VND</td>
-                        <td>
-                            <a href="removeCartItem?productId=${item.productId}" class="btn btn-danger btn-sm">Xóa</a>
-                        </td>
+            <!-- Hiển thị giỏ hàng -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
+                    <tr class="text-center">
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Đơn giá (VND)</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền (VND)</th>
+                        <th>Hành động</th>
                     </tr>
-                </c:forEach>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    <!-- Lặp qua từng sản phẩm trong giỏ hàng -->
+                    <c:forEach var="item" items="${cart}" varStatus="status">
+                        <tr>
+                            <td class="text-center">${status.index + 1}</td>
+                            <td class="text-center">${item.productId}</td>
+                            <td>${item.productName}</td>
+                            <td class="text-end">${item.productPrice}</td>
+                            <td class="text-center">
+                                <!-- Form cập nhật số lượng -->
+                                <form action="updateCartItem" method="POST" style="display:inline-block;">
+                                    <input type="hidden" name="productId" value="${item.productId}">
+                                    <input type="number" name="quantity" value="${item.quantity}" min="1" style="width: 60px;" class="form-control d-inline-block text-center">
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Cập nhật</button>
+                                </form>
+                            </td>
+                            <td class="text-end">${item.quantity * item.productPrice}</td>
+                            <td class="text-center">
+                                <!-- Nút xóa sản phẩm -->
+                                <a href="removeCartItem?productId=${item.productId}" class="btn btn-danger btn-sm">Xóa</a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Tổng tiền -->
-            <div class="text-end mt-3">
-                <strong>Tổng tiền:</strong>
-                <c:set var="totalPrice" value="0" />
-                <c:forEach var="item" items="${cart}">
-                    <c:set var="totalPrice" value="${totalPrice + (item.quantity * item.productPrice)}" />
-                </c:forEach>
-                    ${totalPrice} VND
+            <div class="text-end mt-4 mb-3">
+                <h4>
+                    Tổng tiền:
+                    <strong>
+                        <c:set var="totalPrice" value="0"/>
+                        <c:forEach var="item" items="${cart}">
+                            <c:set var="totalPrice" value="${totalPrice + (item.quantity * item.productPrice)}"/>
+                        </c:forEach>
+                            ${totalPrice} VND
+                    </strong>
+                </h4>
             </div>
             <hr>
 
-            <!-- Chuyển đến form thanh toán -->
-            <h2>Thông Tin Thanh Toán</h2>
+            <!-- Form thanh toán -->
+            <h2 class="mt-4">Thông Tin Thanh Toán</h2>
             <form action="processOrder" method="post">
                 <div class="mb-4">
-                    <h4>Thông tin khách hàng</h4>
+                    <h5>Thông tin khách hàng</h5>
                     <p><strong>Email:</strong> <%= userEmail %></p>
-                    <p><strong>Địa chỉ giao hàng:</strong></p>
-                    <textarea name="shippingAddress" class="form-control" rows="3" required placeholder="Nhập địa chỉ giao hàng của bạn"></textarea>
                 </div>
-                <div class="text-end mt-4">
-                    <button type="submit" class="btn btn-success">Xác Nhận Thanh Toán</button>
+                <div class="mb-3">
+                    <label for="shippingAddress" class="form-label">Địa chỉ giao hàng:</label>
+                    <textarea name="shippingAddress" class="form-control" id="shippingAddress" rows="3" required placeholder="Nhập địa chỉ giao hàng của bạn"></textarea>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success btn-lg">Xác Nhận Thanh Toán</button>
                 </div>
             </form>
+
+            <div class="text-center mt-5">
+                <a href="products.jsp" class="btn btn-secondary">Tiếp tục mua sắm</a>
+            </div>
         </c:otherwise>
     </c:choose>
 </div>
